@@ -14,8 +14,9 @@ function rnd(num) {
 
 function playSlotMachine(allMoney, bet) {
     let win = false;
-    let payback = allMoney;
     const bid = Number(bet);
+    let payback = allMoney - bid;
+    let winnings = 0;
 
     const slots = [
         slotValues[rnd(slotValues.length)],
@@ -25,34 +26,36 @@ function playSlotMachine(allMoney, bet) {
     if (slots[0] === slots[1] && slots[0] === slots[2]) {
         win = true;
         if (slots[0] === 'seven') {
-            payback += bid * 100;
+            winnings = bid * 100;
+            payback += winnings;
         } else if (slots[0] === 'cherry') {
-            payback += bid * 50;
+            winnings = bid * 30;
+            payback += winnings;
         } else if (slots[0] === 'banana') {
-            payback += bid * 20;
+            winnings = bid * 25;
+            payback += winnings;
         } else if (slots[0] === 'watermelon') {
-            payback += bid * 10;
+            winnings = bid * 20;
+            payback += winnings;
         } else if (slots[0] === 'orange') {
-            payback += bid * 5;
+            winnings = bid * 15;
+            payback += winnings;
         } else if (slots[0] === 'lemon') {
-            payback += bid * 2;
+            winnings = bid * 10;
+            payback += winnings;
         }
-    } else {
-        payback -= Number(bet);
     }
-    return {slots, win, payback}
+    return {slots, win, winnings, payback}
 }
 
 module.exports = {
     signup: async (req, res) => {
         const {username, password} = req.body;
         const hash = await bcrypt.hash(password, 10);
-
         const user = new userDb({
             username: username,
             password: hash,
         })
-
         try {
             await user.save();
             resSend(res, false, null, 'Registered');
@@ -97,13 +100,11 @@ module.exports = {
         const {bet} = req.params;
         if (userLegit.money - Number(bet) < 0) return resSend(res, true, null, 'Not enough money');
         const data = playSlotMachine(userLegit.money, Number(bet));
-
         await userDb.findOneAndUpdate(
             {_id: user.id},
             {$set: {money: data.payback}},
             {new: true}
         )
-
         resSend(res, false, data, '');
     }
 }
