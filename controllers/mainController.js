@@ -102,9 +102,24 @@ module.exports = {
         const data = playSlotMachine(userLegit.money, Number(bet));
         await userDb.findOneAndUpdate(
             {_id: user.id},
-            {$set: {money: data.payback}},
+            {$set: {
+                    money: data.payback,
+                    games: userLegit.games + 1,
+                    moneyLost: userLegit.moneyLost + userLegit.money - data.payback }},
             {new: true}
         )
         resSend(res, false, data, '');
+    },
+    getPlayersByMostMoney: async (req, res) => {
+        const data = await userDb.find().sort({money: -1});
+        const users = [];
+        data.map(x => users.push({username: x.username, games: x.games, money: x.money}));
+        resSend(res, false, users, '');
+    },
+    getPlayersByLostMoney: async (req, res) => {
+        const data = await userDb.find().sort({moneyLost: -1});
+        const users = [];
+        data.map(x => users.push({username: x.username, games: x.games, money: x.moneyLost}));
+        resSend(res, false, users, '');
     }
 }

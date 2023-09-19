@@ -14,6 +14,16 @@ const userSchema = new Schema({
         type: Number,
         required: true,
         default: 100
+    },
+    games: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    moneyLost: {
+        type: Number,
+        required: true,
+        default: 0
     }
 });
 

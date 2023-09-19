@@ -5,7 +5,9 @@ const {
     signup,
     login,
     getUser,
-    roll
+    roll,
+    getPlayersByMostMoney,
+    getPlayersByLostMoney
 } = require("../controllers/mainController");
 const {
     validateSignUp,
@@ -17,5 +19,8 @@ router.post("/signup", validateSignUp, signup);
 router.post("/login", validateLogIn, login);
 router.get("/getUser", validateUser, getUser);
 router.get("/roll/:bet", validateUser, roll);
+router.get("/mostMoney", getPlayersByMostMoney);
+router.get("/mostLost", getPlayersByLostMoney);
+
 
 module.exports = router;
